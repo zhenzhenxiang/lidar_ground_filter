@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(pcl_test)
+project(lidar_ground_filter)
 
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++14)
 
 
 find_package(catkin REQUIRED COMPONENTS
@@ -10,7 +10,7 @@ roscpp
 sensor_msgs
 )
 
-find_package(PCL 1.7 REQUIRED)
+find_package(PCL 1.10 REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -23,7 +23,7 @@ include_directories(
 )
 link_directories(${PCL_LIBRARY_DIRS})
 
-add_executable(${PROJECT_NAME}_node src/pcl_test_node.cpp src/pcl_test_core.cpp)
+add_executable(${PROJECT_NAME}_node src/filter_node.cpp src/filter_core.cpp)
 
 
 target_link_libraries(${PROJECT_NAME}_node

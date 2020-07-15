@@ -1,8 +1,8 @@
-#include "pcl_test_core.h"
+#include "filter_core.h"
 
-PclTestCore::PclTestCore(ros::NodeHandle &nh)
+RayGroundFilter::RayGroundFilter(ros::NodeHandle &nh)
 {
-    sub_point_cloud_ = nh.subscribe("/velodyne_points", 10, &PclTestCore::point_cb, this);
+    sub_point_cloud_ = nh.subscribe("/velodyne_points", 10, &RayGroundFilter::point_cb, this);
 
     pub_ground_ = nh.advertise<sensor_msgs::PointCloud2>("/filtered_points_ground", 10);
     pub_no_ground_ = nh.advertise<sensor_msgs::PointCloud2>("/filtered_points_no_ground", 10);
@@ -10,13 +10,13 @@ PclTestCore::PclTestCore(ros::NodeHandle &nh)
     ros::spin();
 }
 
-PclTestCore::~PclTestCore() {}
+RayGroundFilter::~RayGroundFilter() {}
 
-void PclTestCore::Spin()
+void RayGroundFilter::Spin()
 {
 }
 
-void PclTestCore::clip_above(double clip_height, const pcl::PointCloud<pcl::PointXYZI>::Ptr in,
+void RayGroundFilter::clip_above(double clip_height, const pcl::PointCloud<pcl::PointXYZI>::Ptr in,
                              const pcl::PointCloud<pcl::PointXYZI>::Ptr out)
 {
     pcl::ExtractIndices<pcl::PointXYZI> cliper;
@@ -36,7 +36,7 @@ void PclTestCore::clip_above(double clip_height, const pcl::PointCloud<pcl::Poin
     cliper.filter(*out);
 }
 
-void PclTestCore::remove_close_pt(double min_distance, const pcl::PointCloud<pcl::PointXYZI>::Ptr in,
+void RayGroundFilter::remove_close_pt(double min_distance, const pcl::PointCloud<pcl::PointXYZI>::Ptr in,
                                   const pcl::PointCloud<pcl::PointXYZI>::Ptr out)
 {
     pcl::ExtractIndices<pcl::PointXYZI> cliper;
@@ -65,7 +65,7 @@ void PclTestCore::remove_close_pt(double min_distance, const pcl::PointCloud<pcl
  * @param[out] out_radial_divided_indices Indices of the points in the original cloud for each radial segment
  * @param[out] out_radial_ordered_clouds Vector of Points Clouds, each element will contain the points ordered
  */
-void PclTestCore::XYZI_to_RTZColor(const pcl::PointCloud<pcl::PointXYZI>::Ptr in_cloud,
+void RayGroundFilter::XYZI_to_RTZColor(const pcl::PointCloud<pcl::PointXYZI>::Ptr in_cloud,
                                    PointCloudXYZIRTColor &out_organized_points,
                                    std::vector<pcl::PointIndices> &out_radial_divided_indices,
                                    std::vector<PointCloudXYZIRTColor> &out_radial_ordered_clouds)
@@ -121,7 +121,7 @@ void PclTestCore::XYZI_to_RTZColor(const pcl::PointCloud<pcl::PointXYZI>::Ptr in
  * @param out_ground_indices Returns the indices of the points classified as ground in the original PointCloud
  * @param out_no_ground_indices Returns the indices of the points classified as not ground in the original PointCloud
  */
-void PclTestCore::classify_pc(std::vector<PointCloudXYZIRTColor> &in_radial_ordered_clouds,
+void RayGroundFilter::classify_pc(std::vector<PointCloudXYZIRTColor> &in_radial_ordered_clouds,
                               pcl::PointIndices &out_ground_indices,
                               pcl::PointIndices &out_no_ground_indices)
 {
@@ -169,9 +169,9 @@ void PclTestCore::classify_pc(std::vector<PointCloudXYZIRTColor> &in_radial_orde
             }
             else
             {
-                //check if previous point is too far from previous one, if so classify again
+                //check if previous point is too far from previous one, if so classify again with global threshold
                 if (points_distance > reclass_distance_threshold_ &&
-                    (current_height <= (-SENSOR_HEIGHT + height_threshold) && current_height >= (-SENSOR_HEIGHT - height_threshold)))
+                    (current_height <= (-SENSOR_HEIGHT + general_height_threshold) && current_height >= (-SENSOR_HEIGHT - general_height_threshold)))
                 {
                     current_ground = true;
                 }
@@ -198,7 +198,7 @@ void PclTestCore::classify_pc(std::vector<PointCloudXYZIRTColor> &in_radial_orde
     }
 }
 
-void PclTestCore::publish_cloud(const ros::Publisher &in_publisher,
+void RayGroundFilter::publish_cloud(const ros::Publisher &in_publisher,
                                 const pcl::PointCloud<pcl::PointXYZI>::Ptr in_cloud_to_publish_ptr,
                                 const std_msgs::Header &in_header)
 {
@@ -208,7 +208,7 @@ void PclTestCore::publish_cloud(const ros::Publisher &in_publisher,
     in_publisher.publish(cloud_msg);
 }
 
-void PclTestCore::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr)
+void RayGroundFilter::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_ptr)
 {
     pcl::PointCloud<pcl::PointXYZI>::Ptr current_pc_ptr(new pcl::PointCloud<pcl::PointXYZI>);
     pcl::PointCloud<pcl::PointXYZI>::Ptr cliped_pc_ptr(new pcl::PointCloud<pcl::PointXYZI>);

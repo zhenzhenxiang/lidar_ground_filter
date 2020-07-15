@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>pcl_test</name>
+  <name>lidar_ground_filter</name>
   <version>0.0.1</version>
-  <description>The pcl_test package</description>
+  <description>The lidar_ground_filter package</description>
 
 
   <maintainer email="shenzb12@lzu.edu.cn">adam</maintainer>
