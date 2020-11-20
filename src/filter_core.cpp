@@ -215,6 +215,12 @@ void RayGroundFilter::point_cb(const sensor_msgs::PointCloud2ConstPtr &in_cloud_
 
     pcl::fromROSMsg(*in_cloud_ptr, *current_pc_ptr);
 
+    if (current_pc_ptr->size() == 0)
+    {
+        ROS_WARN("Warning: Empty cloud!");
+        return;
+    }
+
     clip_above(CLIP_HEIGHT, current_pc_ptr, cliped_pc_ptr);
     pcl::PointCloud<pcl::PointXYZI>::Ptr remove_close(new pcl::PointCloud<pcl::PointXYZI>);
 
