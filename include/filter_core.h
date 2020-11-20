@@ -11,16 +11,16 @@
 
 #include <sensor_msgs/PointCloud2.h>
 
-#define CLIP_HEIGHT 3.0 //0.2 //截取掉高于雷达自身0.2米的点
+#define CLIP_HEIGHT 0.2 //0.2 //截取掉高于雷达自身0.2米的点
 #define MIN_DISTANCE 2.4
-#define RADIAL_DIVIDER_ANGLE 0.4 //0.18
-#define SENSOR_HEIGHT 0.0 //1.78
+#define RADIAL_DIVIDER_ANGLE 0.2 //0.18
+#define SENSOR_HEIGHT 1.50 //1.78
 
 #define concentric_divider_distance_ 0.0 //0.1 meters default
 #define min_height_threshold_ 0.05
-#define local_max_slope_ 8   //max slope of the ground between points, degree
+#define local_max_slope_ 10   //max slope of the ground between points, degree
 #define general_max_slope_ 5 //max slope of the ground in entire point cloud, degree
-#define reclass_distance_threshold_ 0.2
+#define reclass_distance_threshold_ 0.3
 
 class RayGroundFilter
 {
